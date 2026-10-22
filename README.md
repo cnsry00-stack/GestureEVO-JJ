@@ -12,7 +12,7 @@ Android 手势与快捷操作工具，让常用操作触手可及。
 
 ## 本仓库说明
 
-本仓库基于 GestureEVO 上游 `c688e7f` 开发，是未获官方背书的分支，遵循 GPL-3.0-only。
+本仓库是 [LumiaGG/GestureEVO](https://github.com/LumiaGG/GestureEVO) 的分支（基于上游 `c688e7f`），非官方版本，遵循 GPL-3.0-only。
 相对于上游的修改（2026-10-22）：
 
 - 新增「Pin 池设置 → 自动写入剪贴板」开关，默认关闭。开启后，图片在保存进 Pin 池的同时写入系统剪贴板。
