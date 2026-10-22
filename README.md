@@ -10,6 +10,17 @@ Android 手势与快捷操作工具，让常用操作触手可及。
 
 支持 Android 7.0 及以上的 ARM64 设备。按功能需要授予无障碍、悬浮窗等权限；部分系统操作需要 Root 或 Shizuku。
 
+## 本仓库说明
+
+本仓库基于 GestureEVO 上游 `c688e7f` 开发，是未获官方背书的分支，遵循 GPL-3.0-only。
+相对于上游的修改（2026-10-22）：
+
+- 新增「Pin 池设置 → 自动写入剪贴板」开关，默认关闭。开启后，图片在保存进 Pin 池的同时写入系统剪贴板。
+- 将图片写剪贴板的底层实现收敛为 `ClipboardUtils.copyImageToClipboard()`，`InspireHelperUtils` 改为复用该实现。
+- 移除未被调用的 `ClipboardUtils.copyImage()` 与 `BitmapUtils.getUriFromBitmap()`（依赖已废弃的 `MediaStore.Images.Media.insertImage`）。
+
+修改部分同样以 GPL-3.0-only 授权。上游版权归原作者所有，详见 `NOTICE`。
+
 ## 构建
 
 配置 JDK 17、Python 3.10+ 和 Android SDK 后运行：
