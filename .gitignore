@@ -43,3 +43,6 @@ app/release/*
 **/.env
 **/.env.*
 !**/.env.example
+
+# Local offline build cache
+/.offline-cache/

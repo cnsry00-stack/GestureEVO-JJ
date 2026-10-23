@@ -30,6 +30,11 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++17"
+                // Local offline build: reuse the cached abseil sources instead of fetching.
+                val abseilCache = rootProject.file(".offline-cache/abseil-cpp-src")
+                if (abseilCache.isDirectory) {
+                    arguments("-DFETCHCONTENT_SOURCE_DIR_ABSEIL-CPP=" + abseilCache.absolutePath.replace(File.separatorChar, '/'))
+                }
             }
         }
     }
