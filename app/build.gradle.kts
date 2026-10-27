@@ -17,8 +17,8 @@ android {
         applicationId = "io.github.lumiagg.gestureevo"
         minSdk = 24
         targetSdk = 36
-        versionCode = 261023002
-        versionName = "2026.10.23.1"
+        versionCode = 261027001
+        versionName = "2026.10.27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
