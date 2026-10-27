@@ -540,6 +540,29 @@ class GestureAddActionActivity : AppCompatActivity() {
                 selectTempDndAction(configBinding, actionLink, oldQueryList)
             }
 
+            GestureActionType.PAUSE_GESTURE -> {
+                showEditTextBottomSheet(
+                    activity = this,
+                    coroutineScope = lifecycleScope,
+                    title = getString(R.string.gesture_add_action_pause_seconds_title),
+                    hint = getString(R.string.gesture_add_action_pause_seconds_hint),
+                    defaultText = oldQueryList.find { it.first == "seconds" }?.second ?: "3",
+                    onConfirm = { inputText ->
+                        val seconds = inputText.trim().toIntOrNull()
+                        if (seconds == null || seconds <= 0) {
+                            Toast.makeText(
+                                this,
+                                getString(R.string.gesture_add_action_pause_seconds_invalid),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            actionLink.addParams("seconds", seconds.toString())
+                            applyLink(configBinding)
+                        }
+                    }
+                )
+            }
+
             GestureActionType.OTHER_SHORTCUT -> {
                 selectOtherShortcut(configBinding)
             }

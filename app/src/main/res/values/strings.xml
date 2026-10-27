@@ -963,6 +963,10 @@
     <string name="gesture_action_search">搜索</string>
     <string name="gesture_action_pin_pool">Pin池</string>
     <string name="gesture_action_temp_dnd">临时免打扰</string>
+    <string name="gesture_action_pause_gesture">临时禁用手势</string>
+    <string name="gesture_add_action_pause_seconds_title">临时禁用手势</string>
+    <string name="gesture_add_action_pause_seconds_hint">请输入禁用秒数</string>
+    <string name="gesture_add_action_pause_seconds_invalid">请输入大于0的秒数</string>
     <string name="temp_dnd_policy_access_required">请先授权“免打扰权限”</string>
     <plurals name="temp_dnd_enabled_minutes">
         <item quantity="one">已开启免打扰 %1$d 分钟</item>

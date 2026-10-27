@@ -883,6 +883,10 @@
     <string name="gesture_action_search">Search</string>
     <string name="gesture_action_pin_pool">Pin pool</string>
     <string name="gesture_action_temp_dnd">Temporary DND</string>
+    <string name="gesture_action_pause_gesture">Pause gestures</string>
+    <string name="gesture_add_action_pause_seconds_title">Pause gestures</string>
+    <string name="gesture_add_action_pause_seconds_hint">Enter duration in seconds</string>
+    <string name="gesture_add_action_pause_seconds_invalid">Enter a number of seconds greater than 0</string>
     <string name="temp_dnd_policy_access_required">Please grant Do Not Disturb access first</string>
     <plurals name="temp_dnd_enabled_minutes">
         <item quantity="one">Do Not Disturb enabled for %1$d minute</item>
