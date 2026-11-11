@@ -638,6 +638,14 @@ object SettingsSearchRegistry {
             keywords = listOf("震动", "振动", "框选", "进入框选", "vibrate")
         ),
         entry(
+            id = "inspire_edge_back",
+            titleResId = R.string.inspire_settings_edge_back,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.screenContentSwitchCard,
+            keywords = listOf("返回", "边缘", "滑动", "悬浮窗", "back", "edge", "swipe")
+        ),
+        entry(
             id = "inspire_delay_remove",
             titleResId = R.string.inspire_settings_delay_remove_image,
             pageTitleResId = R.string.inspire_settings_title,
@@ -668,6 +676,54 @@ object SettingsSearchRegistry {
             targetActivity = InspireSettingsActivity::class.java,
             targetViewId = R.id.defaultShareBehaviorCard,
             keywords = listOf("默认分享行为", "share behavior")
+        ),
+        entry(
+            id = "inspire_external_drop",
+            titleResId = R.string.inspire_settings_external_drop,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("外部拖放", "拖拽", "工具按钮", "Pin池", "Pin图", "分词", "悬浮窗", "drop", "drag", "tool buttons", "tokenize")
+        ),
+        entry(
+            id = "inspire_external_drop_position",
+            titleResId = R.string.inspire_settings_external_drop_position,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("拖放悬浮窗位置", "底部", "左侧", "右侧", "drop", "position", "bottom", "left", "right")
+        ),
+        entry(
+            id = "inspire_external_drop_sidebar_max_columns",
+            titleResId = R.string.inspire_settings_external_drop_sidebar_max_columns,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("拖放", "侧边", "最大列数", "drop", "sidebar", "columns")
+        ),
+        entry(
+            id = "inspire_external_drop_sidebar_max_height",
+            titleResId = R.string.inspire_settings_external_drop_sidebar_max_height,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("拖放", "侧边", "高度上限", "安全可用高度", "百分比", "drop", "sidebar", "height", "percent")
+        ),
+        entry(
+            id = "inspire_external_drop_sidebar_fill_priority",
+            titleResId = R.string.inspire_settings_external_drop_sidebar_fill_priority,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("拖放", "排布优先级", "高度", "展开列", "更窄", "更短", "drop", "sidebar", "layout", "priority", "height", "columns")
+        ),
+        entry(
+            id = "inspire_external_drop_engines",
+            titleResId = R.string.inspire_settings_external_drop_engines,
+            pageTitleResId = R.string.inspire_settings_title,
+            targetActivity = InspireSettingsActivity::class.java,
+            targetViewId = R.id.defaultShareBehaviorCard,
+            keywords = listOf("外部拖放", "搜索引擎", "图片搜索", "drop", "search engine")
         ),
         entry(
             id = "inspire_translation_app",

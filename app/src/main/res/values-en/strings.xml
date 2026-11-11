@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="external_drop_pool">Add to Pin Pool</string>
+    <string name="external_drop_previous_page">Hover for previous page</string>
+    <string name="external_drop_next_page">Hover for next page</string>
+    <string name="external_drop_pin">Pin</string>
+    <string name="external_drop_tokenize">Tokenize</string>
+    <string name="external_drop_added">Added to Pin Pool</string>
+    <string name="external_drop_empty">No text or images to receive</string>
+    <string name="external_drop_failed">Unable to read the dropped content</string>
     <string name="app_name">GestureEVO</string>
     <string name="action_icon_placeholder">GE</string>
     <string name="action_icon_invisible">Transparent</string>
@@ -117,7 +125,6 @@
     <string name="appearance_settings_color_scheme_sunset">Twilight Amber</string>
     <string name="appearance_settings_color_scheme_midnight">Midnight Violet</string>
     <string name="appearance_settings_color_scheme_pink">Blush Rose</string>
-    <string name="appearance_settings_color_scheme_restart_hint">After switching schemes, fully restart the app to ensure it applies everywhere</string>
     <string name="appearance_settings_language_title">Language</string>
     <string name="appearance_settings_language_hint">Select Language</string>
     <string name="appearance_settings_language_follow_system">Follow System</string>
@@ -130,6 +137,15 @@
     <string name="appearance_settings_pointer_title">Pointer Settings</string>
     <string name="appearance_settings_pointer_color">Pointer color</string>
     <string name="appearance_settings_pointer_color_summary">Tap to choose the pointer color, long press to reset it</string>
+    <string name="appearance_settings_pointer_shape">Pointer shape</string>
+    <string name="appearance_settings_pointer_shape_dot">Dot</string>
+    <string name="appearance_settings_pointer_shape_small_dot">Small dot</string>
+    <string name="appearance_settings_pointer_shape_cross">Crosshair</string>
+    <string name="appearance_settings_pointer_shape_arrow">Arrow</string>
+    <string name="appearance_settings_pointer_size">Pointer size</string>
+    <string name="appearance_settings_pointer_size_summary">Adjust the display size of the pointer icon</string>
+    <string name="appearance_settings_pointer_click_feedback">Click feedback</string>
+    <string name="appearance_settings_pointer_click_feedback_summary">Scale the pointer briefly on tap</string>
     <string name="appearance_settings_background_blur_summary">Enable background blur when supported by the system</string>
     <string name="appearance_settings_card_background_blur_summary">Enable separate blur for card areas</string>
     <string name="appearance_settings_fluid_title">Gesture fluid feedback</string>
@@ -237,6 +253,20 @@
     <string name="gesture_add_action_config_link_hint">link</string>
     <string name="icon_select_title">Select Icon Source</string>
     <string name="icon_select_gallery">Select from Gallery</string>
+    <string name="icon_editor_title">Edit icon</string>
+    <string name="icon_editor_preview">Live icon preview</string>
+    <string name="icon_editor_preview_hint">Adjust scale, corners and position to preview your icon.</string>
+    <string name="icon_editor_wheel_preview">Your target wheel’s icon style is applied. The preview is enlarged proportionally.</string>
+    <string name="icon_editor_scale">Scale</string>
+    <string name="icon_editor_round">Image corners</string>
+    <string name="icon_editor_horizontal">Horizontal position</string>
+    <string name="icon_editor_vertical">Vertical position</string>
+    <string name="icon_editor_reset">Reset</string>
+    <string name="icon_editor_apply">Apply image</string>
+    <string name="icon_editor_apply_text">Apply text icon</string>
+    <string name="icon_editor_text_preview_hint">Type to preview your text icon, then apply it when ready.</string>
+    <string name="icon_editor_load_failed">Unable to read the image. Please choose another image.</string>
+    <string name="icon_editor_save_failed">Unable to save the image. Please try again.</string>
     <string name="icon_select_app_icon">Use App Icon</string>
     <string name="icon_select_text_icon">Use Text Icon</string>
     <string name="acc_action_select_title">Select Accessibility Function</string>
@@ -346,6 +376,17 @@
     <string name="se_share_image_select_activity">Select Image Share Target</string>
     <string name="se_share_image_target_label">Target App and Image Share Target:</string>
     <string name="se_share_image_not_set">Not Set</string>
+    <string name="se_share_image_switch_title">Also Support Image Share</string>
+    <string name="se_share_image_switch_description">Search text using the mode above or share images to the app below. When both are available, use the search preference below.</string>
+    <string name="se_share_image_switch_enable">Enable image search</string>
+    <string name="se_mixed_content_mode_title">When text and images are both available</string>
+    <string name="se_mixed_content_mode_description">Applies to screen recognition, the search page, and external drops. When only one content type is available, use its corresponding mode.</string>
+    <string name="se_mixed_content_mode_text">Prefer text</string>
+    <string name="se_mixed_content_mode_image">Prefer images</string>
+    <string name="se_mixed_content_mode_ask">Ask every time</string>
+    <string name="search_content_mode_title">Choose search mode</string>
+    <string name="search_content_mode_text">Text search</string>
+    <string name="search_content_mode_image">Image search</string>
 
 
     <string name="setting_gesture">Settings</string>
@@ -403,6 +444,8 @@
     <string name="inspire_settings_ocr_priority_desc">Choose the preferred text acquisition method, Accessibility or OCR</string>
     <string name="inspire_settings_double_check">Double Confirmation After Frame Selection</string>
     <string name="inspire_settings_double_check_desc">Preview the selected area first, then enter tokenization after confirmation</string>
+    <string name="inspire_settings_edge_back">Overlay Edge Swipe Back</string>
+    <string name="inspire_settings_edge_back_desc">Swipe inward from either edge to close the screen content overlay. Turn off to select areas starting from the edges</string>
     <string name="inspire_settings_selection_vibrate">Vibrate when Entering Selection</string>
     <string name="inspire_settings_selection_vibrate_desc">Trigger vibration feedback when opening screen content and entering selection</string>
     <string name="inspire_settings_delay_remove_image">Delay 5 minutes before deleting image</string>
@@ -701,6 +744,7 @@
     <string name="search_engine_type_extern_jump">External Jump</string>
     <string name="search_engine_type_share">Share</string>
     <string name="search_engine_type_share_image">Share Image</string>
+    <string name="search_engine_type_with_image">%1$s + Image share</string>
     <string name="search_engine_option_hide">Hide</string>
     <string name="search_engine_option_show">Show</string>
     <string name="search_engine_option_edit">Edit</string>
@@ -886,7 +930,12 @@
     <string name="gesture_action_pause_gesture">Pause gestures</string>
     <string name="gesture_add_action_pause_seconds_title">Pause gestures</string>
     <string name="gesture_add_action_pause_seconds_hint">Enter duration in seconds</string>
-    <string name="gesture_add_action_pause_seconds_invalid">Enter a number of seconds greater than 0</string>
+    <string name="gesture_add_action_pause_seconds_invalid">Enter between 1 and 86400 seconds</string>
+    <string name="pause_gesture_scope_title">Pause scope</string>
+    <string name="pause_gesture_scope_current">Current trigger area</string>
+    <string name="pause_gesture_scope_all">All trigger areas</string>
+    <string name="pause_gesture_scope_description">Current trigger area pauses the area used for this gesture, or the area that opened the wheel. Its mirrored area is included.</string>
+    <string name="pause_gesture_action_summary">%1$s · %2$s s</string>
     <string name="temp_dnd_policy_access_required">Please grant Do Not Disturb access first</string>
     <plurals name="temp_dnd_enabled_minutes">
         <item quantity="one">Do Not Disturb enabled for %1$d minute</item>
@@ -906,6 +955,22 @@
     <string name="temp_dnd_notification_redefine_action">Redefine time</string>
     <string name="temp_dnd_notification_redefine_hint">Enter minutes</string>
     <string name="temp_dnd_notification_stop_action">Turn off now</string>
+    <string name="pause_gesture_notification_channel_name">Paused gesture countdown</string>
+    <string name="pause_gesture_notification_channel_desc">Shows the remaining time a trigger stays paused</string>
+    <string name="pause_gesture_notification_title">Trigger is paused</string>
+    <plurals name="pause_gesture_notification_text_seconds">
+        <item quantity="one">%1$s paused, total duration %2$d second</item>
+        <item quantity="other">%1$s paused, total duration %2$d seconds</item>
+    </plurals>
+    <plurals name="pause_gesture_notification_text_minutes">
+        <item quantity="one">%1$s paused, total duration %2$d minute</item>
+        <item quantity="other">%1$s paused, total duration %2$d minutes</item>
+    </plurals>
+    <string name="pause_gesture_notification_extend_action">Extend pause</string>
+    <string name="pause_gesture_notification_extend_hint">Enter seconds</string>
+    <string name="pause_gesture_notification_restore_action">Resume now</string>
+    <string name="pause_gesture_permission_notice_title">Notification permission required</string>
+    <string name="pause_gesture_permission_notice_message">Pause gestures posts a countdown notification so you can see the remaining time, extend the pause, or resume early. You should grant notification permission now.</string>
     <string name="gesture_type_touch">Touch</string>
     <string name="pin_pool_empty">No saved Pins</string>
     <string name="color_picker_title">Choose Color</string>
@@ -1016,7 +1081,23 @@
     <string name="gesture_type_batch_apply">Apply to selection</string>
     <string name="gesture_type_batch_selected_count">Selected gestures: %1$d; stages: %2$d</string>
     <string name="inspire_settings_screen_content_description">Manage screen text recognition, copying and screenshots</string>
-    <string name="inspire_settings_share_settings_description">Choose the default action for text segmentation and pin pool shares</string>
+    <string name="inspire_settings_share_settings_description">Configure default sharing and external drag and drop</string>
+    <string name="inspire_settings_external_drop">Show Tool Buttons when Dragging</string>
+    <string name="inspire_settings_external_drop_desc">Show the Pin Pool, Pin, and Tokenize tool buttons when dragging text or images from other apps</string>
+    <string name="inspire_settings_external_drop_position">Drag and Drop Overlay Position</string>
+    <string name="inspire_settings_external_drop_position_bottom">Bottom</string>
+    <string name="inspire_settings_external_drop_position_left">Left</string>
+    <string name="inspire_settings_external_drop_position_right">Right</string>
+    <string name="inspire_settings_external_drop_sidebar_max_columns">Sidebar Maximum Columns</string>
+    <string name="inspire_settings_external_drop_sidebar_max_height">Sidebar Maximum Height</string>
+    <string name="inspire_settings_external_drop_sidebar_max_height_desc">Set a height limit as a percentage of the safe available screen height. Small limits still allow basic drop targets to fit, without extending beyond the screen.</string>
+    <string name="inspire_settings_external_drop_sidebar_height_percent">%1$d%%</string>
+    <string name="inspire_settings_external_drop_sidebar_fill_priority">Layout Priority</string>
+    <string name="inspire_settings_external_drop_sidebar_fill_priority_desc">Use height first for a narrower panel, or expand columns first for a shorter panel</string>
+    <string name="inspire_settings_external_drop_fill_height">Use Height First</string>
+    <string name="inspire_settings_external_drop_fill_columns">Expand Columns First</string>
+    <string name="inspire_settings_external_drop_engines">Show Search Engines when Dragging</string>
+    <string name="inspire_settings_external_drop_engines_desc">Show configured search engines matching the content type in the external drop overlay</string>
     <string name="inspire_settings_app_selection_description">Choose default apps for translation, search and opening images</string>
     <string name="inspire_settings_default_share_image_app_title">Default image sharing app</string>
     <string name="inspire_settings_pointer_settings_description">Adjust pointer trails, touch areas and dragging</string>
@@ -1218,4 +1299,30 @@
     <string name="gesture_add_action_sub_wheel_choose">Choose a wheel group</string>
     <string name="gesture_add_action_sub_wheel_clear">Remove link</string>
     <string name="gesture_add_action_save_failed">Could not save the action. Please try again.</string>
+    <string name="action_editor_title">Action settings</string>
+    <string name="action_editor_edit">Edit action</string>
+    <string name="action_change_icon">Change action icon</string>
+    <string name="action_search">Search actions or categories</string>
+    <string name="action_search_empty">No matching actions</string>
+    <string name="action_category_gestures">Wheels and gestures</string>
+    <string name="action_requires_config">Choose an app or configure parameters next</string>
+    <string name="action_ready">Select this action</string>
+    <string name="action_selected">Selected</string>
+    <string name="action_execution_options">Execution options</string>
+    <string name="action_advanced">Advanced settings</string>
+    <string name="action_raw_link">Action link</string>
+    <string name="action_copy_link">Copy action link</string>
+    <string name="action_link_copied">Action link copied</string>
+    <string name="action_not_selected">No action selected</string>
+    <string name="action_copy_short">Copy short press settings to long press</string>
+    <string name="action_copy_long">Copy long press settings to short press</string>
+    <string name="action_placeholder_add">Add 5 transparent placeholders</string>
+    <string name="action_placeholder_save">Save as a transparent placeholder</string>
+    <string name="action_link_invalid">Enter a valid GestureEVO action link</string>
+    <string name="action_config_copied">Settings copied</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_configure">Configure action parameters</string>
+    <string name="action_minutes_summary">%1$s min</string>
+    <string name="action_seconds_summary">%1$s sec</string>
+    <string name="action_placeholder_single">Add a transparent placeholder</string>
 </resources>

@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
@@ -18,6 +19,7 @@ import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.databinding.SearchEngineItemBinding
 import io.github.lumiagg.gestureevo.search.config.SearchEngine
 import io.github.lumiagg.gestureevo.gesture.ui.RoundImageTextView
+import io.github.lumiagg.gestureevo.utils.VibratorUtils
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -63,6 +65,28 @@ class QuickSearchEnginePager @JvmOverloads constructor(
     private var onEngineClick: (SearchEngine) -> Unit = {}
     private var onEngineLongClick: (SearchEngine) -> Unit = {}
     private var onOrderChanged: (List<SearchEngine>) -> Unit = {}
+    private var acceptsExternalDrag: ((DragEvent) -> Boolean)? = null
+    private var externalEdgePagingEnabled = true
+    private var onExternalDrop: ((SearchEngine, DragEvent, Boolean) -> Boolean)? = null
+    private var onExternalHoverChanged: (SearchEngine?) -> Unit = {}
+    private var externalDragActive = false
+    private val externalHover = ExternalEngineHover()
+    private val externalLongPress = Runnable {
+        if (externalDragActive && externalHover.triggerLongPress()) {
+            VibratorUtils.vibrator(context, false)
+        }
+    }
+    private var externalEdgeDirection = 0
+    private val externalEdgeFlip = object : Runnable {
+        override fun run() {
+            if (!externalDragActive || externalEdgeDirection == 0) return
+            val page = (currentPage + externalEdgeDirection).coerceIn(0, pageCount - 1)
+            if (page == currentPage) return
+            highlightExternalTarget(NO_POSITION)
+            smoothScrollToPage(page)
+            handler.postDelayed(this, edgeFlipDelay + 260L)
+        }
+    }
     private var iconLoader: (RoundImageTextView, SearchEngine, Boolean) -> Unit = { view, engine, badge ->
         setEngineIcon(context, view, engine, badge)
     }
@@ -95,7 +119,10 @@ class QuickSearchEnginePager @JvmOverloads constructor(
         if (config.previewSortMode) {
             startEngineDrag(activeEnginePosition)
         } else {
-            engines.getOrNull(activeEnginePosition)?.let(onEngineLongClick)
+            engines.getOrNull(activeEnginePosition)?.let { engine ->
+                VibratorUtils.vibrator(context, false)
+                onEngineLongClick(engine)
+            }
         }
     }
 
@@ -112,6 +139,7 @@ class QuickSearchEnginePager @JvmOverloads constructor(
         get() = engines.toList()
 
     fun configure(config: Config) {
+        highlightExternalTarget(NO_POSITION)
         this.config = config
         rebuildChildren()
         requestLayout()
@@ -127,10 +155,84 @@ class QuickSearchEnginePager @JvmOverloads constructor(
         this.onOrderChanged = onOrderChanged
     }
 
+    /** Optional global drop support; ordinary search paging and sorting stay unchanged. */
+    fun setExternalDropCallbacks(
+        accepts: (DragEvent) -> Boolean,
+        onDrop: (SearchEngine, DragEvent, Boolean) -> Boolean,
+        onHoverChanged: (SearchEngine?) -> Unit = {},
+        edgePagingEnabled: Boolean = true,
+    ) {
+        externalEdgePagingEnabled = edgePagingEnabled
+        acceptsExternalDrag = accepts
+        onExternalDrop = onDrop
+        onExternalHoverChanged = onHoverChanged
+    }
+
+    override fun onDragEvent(event: DragEvent): Boolean {
+        val accepts = acceptsExternalDrag ?: return super.onDragEvent(event)
+        return when (event.action) {
+            DragEvent.ACTION_DRAG_STARTED -> {
+                highlightExternalTarget(NO_POSITION)
+                accepts(event).also { externalDragActive = it }
+            }
+            DragEvent.ACTION_DRAG_ENTERED, DragEvent.ACTION_DRAG_LOCATION -> {
+                if (!externalDragActive) return false
+                highlightExternalTarget(findEnginePositionUnder(event.x, event.y))
+                val direction = when {
+                    !externalEdgePagingEnabled -> 0
+                    event.x < edgeFlipSize && currentPage > 0 -> -1
+                    event.x > width - edgeFlipSize && currentPage < pageCount - 1 -> 1
+                    else -> 0
+                }
+                if (direction != externalEdgeDirection) {
+                    handler.removeCallbacks(externalEdgeFlip)
+                    externalEdgeDirection = direction
+                    if (direction != 0) handler.postDelayed(externalEdgeFlip, edgeFlipDelay)
+                }
+                true
+            }
+            DragEvent.ACTION_DROP -> {
+                if (!externalDragActive) return false
+                handler.removeCallbacks(externalEdgeFlip)
+                val position = findEnginePositionUnder(event.x, event.y)
+                val freeform = externalHover.isLongPressDrop(position)
+                highlightExternalTarget(NO_POSITION)
+                engines.getOrNull(position)?.let { onExternalDrop?.invoke(it, event, freeform) } ?: false
+            }
+            DragEvent.ACTION_DRAG_EXITED, DragEvent.ACTION_DRAG_ENDED -> {
+                highlightExternalTarget(NO_POSITION)
+                handler.removeCallbacks(externalEdgeFlip)
+                externalEdgeDirection = 0
+                if (event.action == DragEvent.ACTION_DRAG_ENDED) externalDragActive = false
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun highlightExternalTarget(position: Int) {
+        val previousPosition = externalHover.position
+        if (!externalHover.moveTo(position)) return
+        handler.removeCallbacks(externalLongPress)
+        getChildAt(previousPosition)?.alpha = 1f
+        getChildAt(position)?.alpha = 0.55f
+        if (position != NO_POSITION) handler.postDelayed(externalLongPress, longPressTimeout)
+        onExternalHoverChanged(engines.getOrNull(position))
+    }
+
+    override fun onDetachedFromWindow() {
+        externalDragActive = false
+        externalEdgeDirection = 0
+        handler.removeCallbacks(externalEdgeFlip)
+        highlightExternalTarget(NO_POSITION)
+        super.onDetachedFromWindow()
+    }
+
     fun submitList(searchEngines: List<SearchEngine>) {
         if (engines == searchEngines && childCount == searchEngines.size) {
             return
         }
+        highlightExternalTarget(NO_POSITION)
         engines.clear()
         engines.addAll(searchEngines)
         rebuildChildren()

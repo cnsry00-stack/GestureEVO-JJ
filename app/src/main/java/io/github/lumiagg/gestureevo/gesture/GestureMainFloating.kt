@@ -91,6 +91,8 @@ class GestureMainFloating(private val context: GestureService) :
         )
     }
 
+    private var sourceTriggerTag: String? = null
+
     private fun ensureAttached() {
         attachViewSafely(
             actionView,
@@ -272,6 +274,8 @@ class GestureMainFloating(private val context: GestureService) :
                     addFlags(FLAG_ACTIVITY_NEW_TASK)
                     putExtra("tag", tag)
                     putExtra("source", source.name)
+                    putExtra(GestureAddActionActivity.EXTRA_ICON_WHEEL_STYLE,
+                        (if (source == ActionView.ActionViewType.SUB) actionView.subActionView.config else actionView.config).toJson(false))
                 })
             }
 
@@ -282,6 +286,8 @@ class GestureMainFloating(private val context: GestureService) :
                     addFlags(FLAG_ACTIVITY_NEW_TASK)
                     putExtra("tag", tag)
                     putExtra("source", source.name)
+                    putExtra(GestureAddActionActivity.EXTRA_ICON_WHEEL_STYLE,
+                        (if (source == ActionView.ActionViewType.SUB) actionView.subActionView.config else actionView.config).toJson(false))
                     putExtra("editMode", true)
                     putExtra("item", item.toJson())
                 })
@@ -309,13 +315,14 @@ class GestureMainFloating(private val context: GestureService) :
                 }
 
                 fun execute(link: String?) {
+                    val triggerTag = sourceTriggerTag
                     val keepBackgroundBlur = backgroundBlurActive && isSearchActionLink(link)
                     if (keepBackgroundBlur) {
                         keepBackgroundBlurForSearchHandoff()
                     }
                     context.launch(Dispatchers.Default) {
                         link?.let {
-                            ActionProxy(context, it).execute(actionViewAnchor())
+                            ActionProxy(context, it).execute(actionViewAnchor(), sourceTriggerTag = triggerTag)
                         }
                     }
                 }
@@ -356,6 +363,7 @@ class GestureMainFloating(private val context: GestureService) :
         isMirror: Boolean,
         gestureType: GestureTypeEvent
     ) {
+        sourceTriggerTag = triggerConfig.tag
         showActionViewInternal(
             tag = tag,
             selectedIconY = downY,
@@ -375,6 +383,7 @@ class GestureMainFloating(private val context: GestureService) :
     }
 
     suspend fun showActionView(tag: String, triggerConfig: FreeTriggerConfig, isMirror: Boolean = false) {
+        sourceTriggerTag = triggerConfig.tag
         val (centerX, centerY) = resolveTriggerCenter(triggerConfig, isMirror)
         showActionViewInternal(
             tag = tag,
@@ -399,6 +408,7 @@ class GestureMainFloating(private val context: GestureService) :
         isMirror: Boolean = false,
         subItemListTag: String? = null,
     ) {
+        sourceTriggerTag = triggerConfig?.tag
         withContext(Dispatchers.Main) {
             ensureAttached()
         }

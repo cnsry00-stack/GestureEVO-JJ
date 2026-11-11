@@ -5,12 +5,10 @@ import io.github.lumiagg.gestureevo.databinding.BottomSheetIconSelectBinding
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsService
 import androidx.core.graphics.createBitmap
@@ -22,6 +20,9 @@ import io.github.lumiagg.gestureevo.gesture.config.IconType
 import io.github.lumiagg.gestureevo.search.config.EngineType
 import io.github.lumiagg.gestureevo.search.config.SearchEngine
 import io.github.lumiagg.gestureevo.search.config.SearchEngineDataManager
+import io.github.lumiagg.gestureevo.search.config.SearchContentMode
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.github.lumiagg.gestureevo.search.imageBadgeIcon
 import io.github.lumiagg.gestureevo.search.setEngineIcon
 import io.github.lumiagg.gestureevo.settings.ui.ActivityFilters
 import io.github.lumiagg.gestureevo.settings.ui.ActivityModel
@@ -34,6 +35,7 @@ import io.github.lumiagg.gestureevo.utils.readKey
 import io.github.lumiagg.gestureevo.utils.settingsStore
 import io.github.lumiagg.gestureevo.utils.icon.IconFileUtils
 import io.github.lumiagg.gestureevo.utils.icon.IconHelper
+import io.github.lumiagg.gestureevo.utils.icon.IconImageIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,7 +55,7 @@ class SearchEngineAddActivity : AppCompatActivity() {
 
         setupToolbar()
         initView()
-        initData()
+        initData(savedInstanceState)
     }
 
     private fun setupToolbar() {
@@ -92,6 +94,7 @@ class SearchEngineAddActivity : AppCompatActivity() {
         }
 
         setupModeSelector()
+        setupShareImageDualConfig()
 
         // Initially display configuration for first engine type
         showConfigForType(EngineType.DIRECT_LINK)
@@ -133,6 +136,11 @@ class SearchEngineAddActivity : AppCompatActivity() {
         binding.shareToAppConfig.root.visibility = View.GONE
         binding.shareImageToAppConfig.root.visibility = View.GONE
 
+        // The dual-mode image share section only applies to text modes
+        val showImageShareDualConfig = type != EngineType.SHARE_IMAGE_TO_APP
+        binding.shareImageDualConfig.root.visibility =
+            if (showImageShareDualConfig) View.VISIBLE else View.GONE
+
         // Show corresponding configuration layout
         when (type) {
             EngineType.DIRECT_LINK -> {
@@ -155,13 +163,16 @@ class SearchEngineAddActivity : AppCompatActivity() {
                 setupShareToTextAppConfig()
             }
 
-            EngineType.SHARE_IMAGE_TO_APP -> {
-                binding.shareImageToAppConfig.root.visibility = View.VISIBLE
-                setupShareToImageActivityConfig()
+                EngineType.SHARE_IMAGE_TO_APP -> {
+                    binding.shareImageToAppConfig.root.visibility = View.VISIBLE
+                    setupShareToImageActivityConfig()
+                }
             }
+            if (showImageShareDualConfig) {
+                updateShareImageDualDetails()
+            }
+            updateEngineIconPreview()
         }
-        updateEngineIconPreview()
-    }
 
     private fun setupDirectLinkConfig() {
         updateDirectLinkCustomTabsSwitch()
@@ -316,12 +327,68 @@ class SearchEngineAddActivity : AppCompatActivity() {
         }
     }
 
-    private fun initData() {
+    private fun setupShareImageDualConfig() {
+        binding.shareImageDualConfig.mixedContentModeRow.setOnClickListener {
+            val modes = SearchContentMode.entries
+            val labels = modes.map { getString(contentModeLabel(it)) }.toTypedArray()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.se_mixed_content_mode_title)
+                .setSingleChoiceItems(labels, modes.indexOf(searchEngine.mixedContentMode)) { dialog, which ->
+                    searchEngine.mixedContentMode = modes[which]
+                    updateShareImageDualDetails()
+                    dialog.dismiss()
+                }
+                .show()
+        }
+        binding.shareImageDualConfig.imageShareEnableSwitch.setOnCheckedChangeListener { _, isChecked ->
+            searchEngine.imageShareEnabled = isChecked
+            updateShareImageDualDetails()
+            updateEngineIconPreview()
+        }
+        // The engine icon belongs to the text mode, so selecting the image
+        // share target never rewrites the icon automatically.
+        binding.shareImageDualConfig.imageShareDualSelectActivity.setOnClickListener {
+            SelectActivityBottomSheet(this, lifecycleScope, object : SelectActivityCallBack {
+                override fun selectCompleted(model: ActivityModel) {
+                    searchEngine.imageTargetPackage = model.packageName
+                    searchEngine.imageTargetActivity = model.activityName
+                    binding.shareImageDualConfig.imageShareDualTargetActivity.text =
+                        getString(R.string.package_activity_label, model.packageName, model.activityName)
+                }
+            }, ActivityFilters.imageShareFilter()).show()
+        }
+    }
+
+    private fun updateShareImageDualDetails() {
+        binding.shareImageDualConfig.imageShareDualDetails.visibility =
+            if (searchEngine.imageShareEnabled) View.VISIBLE else View.GONE
+        binding.shareImageDualConfig.mixedContentModeValue.setText(contentModeLabel(searchEngine.mixedContentMode))
+    }
+
+    private fun contentModeLabel(mode: SearchContentMode): Int = when (mode) {
+        SearchContentMode.TEXT -> R.string.se_mixed_content_mode_text
+        SearchContentMode.IMAGE -> R.string.se_mixed_content_mode_image
+        SearchContentMode.ASK -> R.string.se_mixed_content_mode_ask
+    }
+
+    private fun formatImageShareDualTarget(): String = when {
+        searchEngine.imageTargetPackage.isNullOrEmpty() ->
+            getString(R.string.se_share_image_not_set)
+        searchEngine.imageTargetActivity.isNullOrEmpty() ->
+            searchEngine.imageTargetPackage.orEmpty()
+        else -> getString(
+            R.string.package_activity_label,
+            searchEngine.imageTargetPackage,
+            searchEngine.imageTargetActivity
+        )
+    }
+
+    private fun initData(savedInstanceState: Bundle?) {
         editMode = intent.getBooleanExtra("editMode", false)
         setupToolbar()
 
-        if (editMode) {
-            intent.getStringExtra("engine")?.let { engineJson ->
+        if (editMode || savedInstanceState?.containsKey("engine_draft") == true) {
+            (savedInstanceState?.getString("engine_draft") ?: intent.getStringExtra("engine"))?.let { engineJson ->
                 SearchEngine.toModel(engineJson)?.let { engine ->
                     searchEngine = engine
                     fillEngineData()
@@ -331,6 +398,13 @@ class SearchEngineAddActivity : AppCompatActivity() {
             searchEngine.tag = SearchEngineDataManager.buildTag()
             updateEngineIconPreview()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        searchEngine.name = binding.etEngineName.text.toString()
+        searchEngine.engineType = currentEngineType
+        outState.putString("engine_draft", searchEngine.toJson())
+        super.onSaveInstanceState(outState)
     }
 
     private fun fillEngineData() {
@@ -376,6 +450,14 @@ class SearchEngineAddActivity : AppCompatActivity() {
                     getString(R.string.package_activity_label, searchEngine.targetPackage, searchEngine.targetActivity)
             }
         }
+
+        if (searchEngine.engineType != EngineType.SHARE_IMAGE_TO_APP) {
+            binding.shareImageDualConfig.imageShareEnableSwitch.isChecked =
+                searchEngine.imageShareEnabled
+            binding.shareImageDualConfig.imageShareDualTargetActivity.text =
+                formatImageShareDualTarget()
+            updateShareImageDualDetails()
+        }
     }
 
     private fun updateDirectLinkCustomTabsSwitch() {
@@ -413,7 +495,9 @@ class SearchEngineAddActivity : AppCompatActivity() {
         bottomSheetView.findViewById<View>(R.id.select_gallery)
             .setOnClickListener {
                 bottomSheet.dismiss()
-                selectImageLauncher.launch("image/*")
+                selectImageLauncher.launch(IconEditorRequest(
+                    badgeIcon = if (showImageBadge) imageBadgeIcon(searchEngine) ?: 0 else 0,
+                ))
             }
 
         bottomSheetView.findViewById<View>(R.id.select_app_icon)
@@ -421,9 +505,10 @@ class SearchEngineAddActivity : AppCompatActivity() {
                 bottomSheet.dismiss()
                 DefaultSelectAPPBottomSheet(this, lifecycleScope, object : SelectAPPCallBack {
                     override fun selectCompleted(model: APPModel) {
-                        IconHelper.getIcon(applicationContext, model.pkgName)?.let { drawable ->
-                            updateAndSaveIcon(drawable)
-                        }
+                        selectImageLauncher.launch(IconEditorRequest(
+                            appPackage = model.pkgName,
+                            badgeIcon = if (showImageBadge) imageBadgeIcon(searchEngine) ?: 0 else 0,
+                        ))
                     }
                 }).show()
             }
@@ -431,55 +516,38 @@ class SearchEngineAddActivity : AppCompatActivity() {
         bottomSheetView.findViewById<View>(R.id.select_text_icon)
             .setOnClickListener {
                 bottomSheet.dismiss()
-                showEditTextBottomSheet(
-                    activity = this,
-                    coroutineScope = lifecycleScope,
-                    title = getString(R.string.search_engine_text_icon_title),
-                    hint = getString(R.string.search_engine_text_icon_hint),
-                    onConfirm = { inputText ->
-                        searchEngine.textIcon = inputText.trim()
-                        searchEngine.iconType = IconType.TEXT
-                        updateEngineIconPreview()
-                    }
-                )
+                selectTextIconLauncher.launch(TextIconEditorRequest(
+                    text = if (searchEngine.iconType == IconType.TEXT) searchEngine.textIcon.orEmpty() else "",
+                    badgeIcon = if (showImageBadge) imageBadgeIcon(searchEngine) ?: 0 else 0,
+                ))
             }
 
         bottomSheet.setContentView(bottomSheetView)
         bottomSheet.show()
     }
 
-    private val selectImageLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { selectedUri ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    searchEngine.iconType = IconType.URI
-                    iconFileUtils.setGalleryIcon(selectedUri)
-                    withContext(Dispatchers.Main) {
-                        iconFileUtils.getImgBitmap()?.let { bitmap ->
-                            binding.engineIcon.setImage(bitmap)
-                            updateEngineIconBadgePreview()
-                        } ?: run {
-                            Toast.makeText(
-                                this@SearchEngineAddActivity,
-                                getString(R.string.search_engine_icon_uri_failed),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@SearchEngineAddActivity,
-                            getString(
-                                R.string.search_engine_icon_image_failed,
-                                e.localizedMessage ?: ""
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+    private val selectTextIconLauncher = registerForActivityResult(TextIconEditorContract()) { text ->
+        if (text != null) {
+            iconFileUtils.clear()
+            searchEngine.textIcon = text
+            searchEngine.iconType = IconType.TEXT
+            searchEngine.icon = null
+            updateEngineIconPreview()
+        }
+    }
+
+    private val selectImageLauncher = registerForActivityResult(IconEditorContract()) { path ->
+        if (path != null) lifecycleScope.launch {
+            val bitmap = withContext(Dispatchers.IO) { IconImageIO.read(path) }
+            if (bitmap != null) {
+                iconFileUtils.setImgBitmap(bitmap)
+                iconFileUtils.imgPath = path
+                searchEngine.iconType = IconType.URI
+                searchEngine.icon = path
+                binding.engineIcon.setImage(bitmap)
+                updateEngineIconBadgePreview()
+            } else {
+                Toast.makeText(this@SearchEngineAddActivity, R.string.icon_editor_load_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -519,11 +587,8 @@ class SearchEngineAddActivity : AppCompatActivity() {
     }
 
     private fun updateEngineIconBadgePreview() {
-        if (searchEngine.engineType == EngineType.SHARE_IMAGE_TO_APP && showImageBadge) {
-            binding.engineIcon.setBadge(R.drawable.baseline_image_24)
-        } else {
-            binding.engineIcon.setBadge(null)
-        }
+        val badgeIcon = if (showImageBadge) imageBadgeIcon(searchEngine) else null
+        binding.engineIcon.setBadge(badgeIcon)
     }
 
 
@@ -564,7 +629,11 @@ class SearchEngineAddActivity : AppCompatActivity() {
             EngineType.SHARE_IMAGE_TO_APP -> {
                 !searchEngine.targetPackage.isNullOrEmpty()
             }
-        }
+        } &&
+            // Dual-mode engines require a dedicated image share target
+            (currentEngineType == EngineType.SHARE_IMAGE_TO_APP ||
+                !searchEngine.imageShareEnabled ||
+                !searchEngine.imageTargetPackage.isNullOrEmpty())
 
         if (!isValid) {
             withContext(Dispatchers.Main) {
