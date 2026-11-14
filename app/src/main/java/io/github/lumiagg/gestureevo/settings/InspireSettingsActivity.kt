@@ -15,7 +15,6 @@ import io.github.lumiagg.gestureevo.gesture.EventBusManager.produceKeyboardEvent
 import io.github.lumiagg.gestureevo.gesture.KeyboardEvent
 import io.github.lumiagg.gestureevo.quick.ui.KeyboardType
 import io.github.lumiagg.gestureevo.settings.ui.BlackListSelectAPPBottomSheet
-import io.github.lumiagg.gestureevo.settings.ui.DefaultLinkOpenManager
 import io.github.lumiagg.gestureevo.settings.ui.DefaultSelectAPPBottomSheet
 import io.github.lumiagg.gestureevo.settings.ui.NotificationDisplayTimeBottomSheet
 import io.github.lumiagg.gestureevo.settings.ui.PointerTouchAreaOffsetBottomSheet
@@ -63,6 +62,10 @@ class InspireSettingsActivity : AppCompatActivity() {
         const val KEY_NOTIFICATION_IMAGE_DISPLAY_SECONDS =
             "key_notification_image_display_seconds"
         const val KEY_SHOW_POINTER_TRAIL = "key_show_pointer_trail"
+
+        /** 链接雷达：指针靠近屏幕链接时高亮并弹出打开气泡，点气泡按规则跳转。 */
+        const val KEY_LINK_RADAR_ENABLED = "key_link_radar_enabled"
+        const val DEFAULT_LINK_RADAR_ENABLED = true
         const val KEY_ALWAYS_SHOW_POINTER_TOUCH_AREA = "key_always_show_pointer_touch_area"
         const val KEY_POINTER_TOUCH_AREA_OFFSET_DP = "key_pointer_touch_area_offset_dp"
         const val KEY_ENABLE_POINTER_DRAG_MODE = "key_enable_pointer_drag_mode"
@@ -181,6 +184,9 @@ class InspireSettingsActivity : AppCompatActivity() {
         binding.pointerDragModeSwitch.isChecked =
             settingsStore.readKey(KEY_ENABLE_POINTER_DRAG_MODE, false)
 
+        binding.linkRadarSwitch.isChecked =
+            settingsStore.readKey(KEY_LINK_RADAR_ENABLED, DEFAULT_LINK_RADAR_ENABLED)
+
         val pinPoolDisplayMode =
             settingsStore.readKey(KEY_PIN_POOL_DISPLAY_MODE, PIN_POOL_DISPLAY_MODE_RIGHT_SIDEBAR)
         updatePinPoolModeText(pinPoolDisplayMode)
@@ -245,11 +251,7 @@ class InspireSettingsActivity : AppCompatActivity() {
         }
 
         binding.linkOpenRow.setOnClickListener {
-            lifecycleScope.launch {
-                val linkOpenManager =
-                    DefaultLinkOpenManager(this@InspireSettingsActivity, lifecycleScope)
-                linkOpenManager.showDefaultLinkOpenSettings()
-            }
+            startActivity(Intent(this@InspireSettingsActivity, LinkRuleSettingsActivity::class.java))
         }
     }
 
@@ -428,6 +430,12 @@ class InspireSettingsActivity : AppCompatActivity() {
         binding.pointerTrailSwitch.setOnCheckedChangeListener { _, isChecked ->
             lifecycleScope.launch {
                 settingsStore.saveKey(KEY_SHOW_POINTER_TRAIL, isChecked)
+            }
+        }
+
+        binding.linkRadarSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                settingsStore.saveKey(KEY_LINK_RADAR_ENABLED, isChecked)
             }
         }
 

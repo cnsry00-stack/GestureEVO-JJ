@@ -46,3 +46,4 @@ app/release/*
 
 # Local offline build cache
 /.offline-cache/
+dist/

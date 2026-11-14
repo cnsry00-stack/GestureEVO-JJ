@@ -142,6 +142,9 @@
             android:name=".settings.InspireSettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".settings.LinkRuleSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".settings.DataBackActivity"
             android:exported="false" />
         <activity
@@ -200,6 +203,22 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service" />
+        </service>
+        <!-- 伪装成 Google Select-to-Speak 的扫描宿主服务（LinkGo 同款方案）：
+             微信等应用按无障碍服务组件身份放行或限制，Google 官方服务身份可绕过限制
+             获取完整节点文本与精确字符坐标。仅作为链接雷达的扫描宿主，无业务逻辑。 -->
+        <service
+            android:name="com.google.android.accessibility.selecttospeak.SelectToSpeakService"
+            android:exported="true"
+            android:label="@string/link_radar_scan_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/select_to_speak_config" />
         </service>
         <service
             android:name=".notification.NotificationService"
