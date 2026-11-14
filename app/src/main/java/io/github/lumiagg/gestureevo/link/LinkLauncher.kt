@@ -1,5 +1,6 @@
 package io.github.lumiagg.gestureevo.link
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,7 +9,10 @@ import io.github.lumiagg.gestureevo.R
 import io.github.lumiagg.gestureevo.diagnostics.AppLogger
 import io.github.lumiagg.gestureevo.diagnostics.LogLevel
 import io.github.lumiagg.gestureevo.diagnostics.LogModule
+import io.github.lumiagg.gestureevo.utils.ActionProxy
 import io.github.lumiagg.gestureevo.utils.UrlDetector
+import io.github.lumiagg.gestureevo.utils.readKey
+import io.github.lumiagg.gestureevo.utils.settingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -167,7 +171,11 @@ object LinkLauncher {
         // Try the launch directly instead of pre-checking resolveActivity: on Android 11+
         // the pre-check is subject to package visibility and can report null even when the
         // target would accept the intent. Let the framework decide and catch the miss.
-        val launched = runCatching { context.startActivity(intent) }
+        val options = buildRadarActivityOptions(context)
+        val launched = runCatching {
+            if (options != null) context.startActivity(intent, options.toBundle())
+            else context.startActivity(intent)
+        }
         if (launched.isSuccess) return@withContext true
         val reason = launched.exceptionOrNull()?.javaClass?.simpleName ?: "unknown"
         AppLogger.event(
@@ -180,7 +188,11 @@ object LinkLauncher {
         // A component-pinned launch that failed may still work through the plain link.
         if (component != null) {
             val unpinned = buildLaunchIntent(context, url, targetPackage, excludeFromRecents, null)
-            if (unpinned != null && runCatching { context.startActivity(unpinned) }.isSuccess) {
+            if (unpinned != null && runCatching {
+                    if (options != null) context.startActivity(unpinned, options.toBundle())
+                    else context.startActivity(unpinned)
+                }.isSuccess
+            ) {
                 return@withContext true
             }
         }
@@ -198,6 +210,23 @@ object LinkLauncher {
         showToast(context, context.getString(R.string.inspire_link_no_app))
         false
     }
+
+    /**
+     * 分发规则的打开方式：小窗 or 全屏（设置项，默认全屏）。
+     *
+     * 小窗复用 GEVO 既有的 FreeForm 通道（ActionProxy.buildFreeformActivityOptions，
+     * 含 ColorOS/Huawei 的反射适配与小窗位置尺寸），全屏返回 null 走普通启动。
+     */
+    private suspend fun buildRadarActivityOptions(context: Context): ActivityOptions? {
+        val smallWindow = runCatching {
+            context.settingsStore.readKey(KEY_LINK_OPEN_IN_SMALL_WINDOW, false)
+        }.getOrDefault(false)
+        if (!smallWindow) return null
+        return runCatching { ActionProxy.buildFreeformActivityOptions(context) }.getOrNull()
+    }
+
+    /** 分发规则触发时的打开方式：true=小窗，false=全屏（默认）。 */
+    const val KEY_LINK_OPEN_IN_SMALL_WINDOW = "key_link_open_in_small_window"
 
     /**
      * Builds the launch intent for a routed link.

@@ -40,7 +40,7 @@ import io.github.lumiagg.gestureevo.screen_search.ScreenSearchFloating
 import io.github.lumiagg.gestureevo.search.AutomatePerformer
 import io.github.lumiagg.gestureevo.settings.ActionViewSettingsActivity.Companion.KEY_DISABLE_ALL_WHEEL_VIBRATE
 import io.github.lumiagg.gestureevo.settings.ActionViewSettingsActivity.Companion.KEY_MAIN_SHOW_VIBRATE
-import io.github.lumiagg.gestureevo.settings.InspireSettingsActivity
+import io.github.lumiagg.gestureevo.settings.LinkRuleSettingsActivity
 import io.github.lumiagg.gestureevo.settings.guide.GuidePreviewSession
 import io.github.lumiagg.gestureevo.utils.ActionProxy
 import io.github.lumiagg.gestureevo.utils.CurrentPackageProvider
@@ -261,8 +261,8 @@ class GestureManager(
                 // 链接雷达跟随指针会话：只在指针开启时扫描，设置开关在取词设置页。
                 if (it.enable) {
                     val radarEnabled = context.settingsStore.readKey(
-                        InspireSettingsActivity.KEY_LINK_RADAR_ENABLED,
-                        InspireSettingsActivity.DEFAULT_LINK_RADAR_ENABLED
+                        LinkRuleSettingsActivity.KEY_LINK_RADAR_ENABLED,
+                        LinkRuleSettingsActivity.DEFAULT_LINK_RADAR_ENABLED
                     )
                     if (radarEnabled) {
                         linkRadarFloating.startSession()

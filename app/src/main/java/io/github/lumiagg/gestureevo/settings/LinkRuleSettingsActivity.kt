@@ -20,7 +20,11 @@ import io.github.lumiagg.gestureevo.databinding.ItemLinkRuleBinding
 import io.github.lumiagg.gestureevo.link.LinkConfigTransfer
 import io.github.lumiagg.gestureevo.link.LinkDispatchRule
 import io.github.lumiagg.gestureevo.link.LinkRuleRepository
+import io.github.lumiagg.gestureevo.link.LinkLauncher
 import io.github.lumiagg.gestureevo.utils.dp2px
+import io.github.lumiagg.gestureevo.utils.readKey
+import io.github.lumiagg.gestureevo.utils.saveKey
+import io.github.lumiagg.gestureevo.utils.settingsStore
 import io.github.lumiagg.gestureevo.utils.VibratorUtils
 import io.github.lumiagg.gestureevo.settings.ui.LinkExemptsBottomSheet
 import io.github.lumiagg.gestureevo.settings.ui.LinkExtractsBottomSheet
@@ -43,6 +47,12 @@ import android.widget.Toast
  */
 class LinkRuleSettingsActivity : AppCompatActivity() {
 
+    companion object {
+        const val KEY_LINK_RADAR_ENABLED = "key_link_radar_enabled"
+        const val DEFAULT_LINK_RADAR_ENABLED = true
+    }
+
+
     private lateinit var binding: ActivityLinkRuleSettingsBinding
     private lateinit var adapter: RuleAdapter
     private var actionMode: androidx.appcompat.view.ActionMode? = null
@@ -61,11 +71,37 @@ class LinkRuleSettingsActivity : AppCompatActivity() {
 
         setupRulesList()
         setupEntries()
+        setupRadarSwitch()
     }
 
     override fun onResume() {
         super.onResume()
         reload()
+    }
+
+    /** 链接雷达开关：雷达运行时读取同一 key。 */
+    private fun setupRadarSwitch() {
+        lifecycleScope.launch {
+            binding.radarSwitch.isChecked = settingsStore.readKey(
+                KEY_LINK_RADAR_ENABLED,
+                DEFAULT_LINK_RADAR_ENABLED
+            )
+        }
+        binding.radarSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                settingsStore.saveKey(KEY_LINK_RADAR_ENABLED, isChecked)
+            }
+        }
+        lifecycleScope.launch {
+            binding.smallWindowSwitch.isChecked = settingsStore.readKey(
+                LinkLauncher.KEY_LINK_OPEN_IN_SMALL_WINDOW, false
+            )
+        }
+        binding.smallWindowSwitch.setOnCheckedChangeListener { _, isChecked ->
+            lifecycleScope.launch {
+                settingsStore.saveKey(LinkLauncher.KEY_LINK_OPEN_IN_SMALL_WINDOW, isChecked)
+            }
+        }
     }
 
     private fun setupRulesList() {

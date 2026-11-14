@@ -37,7 +37,6 @@ import io.github.lumiagg.gestureevo.utils.DynamicColorUtils
 import io.github.lumiagg.gestureevo.utils.HapticHelper
 import io.github.lumiagg.gestureevo.utils.UrlDetector
 import io.github.lumiagg.gestureevo.utils.icon.IconHelper
-import com.google.android.accessibility.selecttospeak.SelectToSpeakService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -82,6 +81,7 @@ class LinkRadarOverlay(
     // 空结果重试（LinkGo runIdentificationFlow 同款）：树未就绪的空扫描自动补扫
     private var emptyRetryJob: Job? = null
     private var emptyRetryCount = 0
+
 
     init {
         layoutParams.configureAccessibilityOverlay(
@@ -196,10 +196,7 @@ class LinkRadarOverlay(
             do {
                 rescanPending = false
                 val patterns = runCatching { compilePatterns() }.getOrDefault(emptyList())
-                // 微信按无障碍服务身份限制数据：伪装服务（Google Select-to-Speak 身份）可用时优先
-                val disguised = SelectToSpeakService.getInstance()
-                val scanService = disguised ?: service
-                val links = runCatching { LinkRadarScanner.scan(scanService, patterns) }.getOrDefault(emptyList())
+                val links = runCatching { LinkRadarScanner.scan(service, patterns) }.getOrDefault(emptyList())
                 Log.d("LinkRadar", "雷达扫描完成：链接 ${links.size} 个")
                 withContext(Dispatchers.Main) {
                     if (!sessionActive) return@withContext
@@ -211,8 +208,8 @@ class LinkRadarOverlay(
                             fields = mapOf(
                                 "count" to links.size,
                                 "package" to (CurrentPackageProvider.currentPackageFlow.value ?: ""),
-                                // 扫描统计：via=D=伪装服务/M=主服务 w=窗口数 n=节点数 t=带文本数 h=含URL字样数
-                                "method" to (if (disguised != null) "D " else "M ") + LinkRadarScanner.lastDiagnostics,
+                                // 扫描统计：w=窗口数 n=节点数 t=带文本数 h=含URL字样数
+                                "method" to LinkRadarScanner.lastDiagnostics,
                             )
                         )
                     }
@@ -281,7 +278,16 @@ class LinkRadarOverlay(
             )
         )
         // LinkGo：单链接直达（WindowRouter.openBrowser 对应我们的 LinkLauncher.openUrl）；
-        // 多链接 LinkGo 走 LinkSelectionActivity，v1 先取最近一条。
+        // 多链接 → LinkSelectionActivity 选择页（LinkGo 同款流程）
+        if (hits.size > 1) {
+            val intent = Intent(service, LinkSelectionActivity::class.java).apply {
+                putStringArrayListExtra(LinkSelectionActivity.EXTRA_URLS, ArrayList(hits.map { it.url }))
+                putExtra(LinkSelectionActivity.EXTRA_SOURCE_PACKAGE, sourcePackage)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            service.startActivity(intent)
+            return
+        }
         val target = hits.first()
         service.launch {
             LinkLauncher.openUrl(

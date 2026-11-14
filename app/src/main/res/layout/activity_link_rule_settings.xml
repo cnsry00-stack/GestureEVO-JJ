@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/settings_card_spacing"
-                app:settingsCardExpanded="true"
+                app:settingsCardExpanded="false"
                 app:settingsCardSummary="@string/link_settings_drag_hint"
                 app:settingsCardTitle="@string/link_rule_title">
 
@@ -181,6 +181,66 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:settingsRowTitle="@string/link_rule_import" />
+                </LinearLayout>
+            </io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard>
+
+            <io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard
+                android:id="@+id/radarCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/settings_card_spacing"
+                app:settingsCardExpanded="false"
+                app:settingsCardSummary="@string/link_settings_radar_desc"
+                app:settingsCardTitle="@string/link_settings_radar_title">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="12dp">
+                    <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:settingsRowTitle="@string/link_settings_radar_enabled_title"
+                        app:settingsRowSummary="@string/link_settings_radar_enabled_desc">
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/radarSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+                    </io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow>
+                </LinearLayout>
+            </io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard>
+
+            <io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard
+                android:id="@+id/openModeCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/settings_card_spacing"
+                app:settingsCardExpanded="false"
+                app:settingsCardSummary="@string/link_settings_open_mode_summary"
+                app:settingsCardTitle="@string/link_settings_open_mode_title">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="12dp">
+                    <io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:settingsRowTitle="@string/link_settings_small_window_title"
+                        app:settingsRowSummary="@string/link_settings_small_window_desc">
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/smallWindowSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
+                    </io.github.lumiagg.gestureevo.settings.ui.SettingsSwitchRow>
                 </LinearLayout>
             </io.github.lumiagg.gestureevo.settings.ui.SettingsSectionCard>
 

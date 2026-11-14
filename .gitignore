@@ -47,3 +47,7 @@ app/release/*
 # Local offline build cache
 /.offline-cache/
 dist/
+
+# Local working notes (contain sensitive paths/tokens)
+/HANDOFF.md
+/PR_REPORT.md
